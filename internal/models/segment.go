@@ -46,3 +46,10 @@ func UpdateSegment(name, description string, distributionRatio float64) error {
 	`, description, distributionRatio, name)
 	return err
 }
+
+func UpdateSegmentDistributionRatio(name string, distributionRatio float64) error {
+	_, err := db.DB.Exec(`
+		UPDATE segments SET distribution_ratio = ? WHERE name = ?
+	`, distributionRatio, name)
+	return err
+}

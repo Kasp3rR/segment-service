@@ -46,7 +46,19 @@ func GetUserSegments(userID int) ([]string, error) {
 	return segments, nil
 }
 
-func AssignSegmentRandomly(segmentID int, ratio float64) (int, error) {
+func AssignSegmentRandomly(segmentName string, ratio float64) (int, error) {
+	// Получаем сегмент по имени
+	segment, err := GetSegmentByName(segmentName)
+	if err != nil || segment == nil {
+		return 0, err
+	}
+
+	// Обновляем distribution_ratio в базе данных
+	err = UpdateSegmentDistributionRatio(segmentName, ratio)
+	if err != nil {
+		return 0, err
+	}
+
 	rows, err := db.DB.Query(`SELECT id FROM users`)
 	if err != nil {
 		return 0, err
@@ -80,10 +92,36 @@ func AssignSegmentRandomly(segmentID int, ratio float64) (int, error) {
 	selected := userIDs[:n]
 	count := 0
 	for _, uid := range selected {
-		err := AddUserToSegment(uid, segmentID)
+		err := AddUserToSegment(uid, segment.ID)
 		if err == nil {
 			count++
 		}
 	}
 	return count, nil
+}
+
+func GetSegmentUsers(segmentName string) ([]int, error) {
+	rows, err := db.DB.Query(`
+		SELECT u.id
+		FROM users u
+		JOIN user_segments us ON u.id = us.user_id
+		JOIN segments s ON us.segment_id = s.id
+		WHERE s.name = ?
+		ORDER BY u.id
+	`, segmentName)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var userIDs []int
+	for rows.Next() {
+		var id int
+		if err := rows.Scan(&id); err != nil {
+			return nil, err
+		}
+		userIDs = append(userIDs, id)
+	}
+
+	return userIDs, nil
 }

@@ -65,13 +65,7 @@ func AssignSegmentRandomlyHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	segment, err := models.GetSegmentByName(name)
-	if err != nil || segment == nil {
-		http.Error(w, "segment not found", http.StatusNotFound)
-		return
-	}
-
-	count, err := models.AssignSegmentRandomly(segment.ID, payload.Ratio)
+	count, err := models.AssignSegmentRandomly(name, payload.Ratio)
 	if err != nil {
 		http.Error(w, "failed to assign segment", http.StatusInternalServerError)
 		return
@@ -105,4 +99,20 @@ func UpdateSegmentHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
+}
+
+func GetSegmentUsersHandler(w http.ResponseWriter, r *http.Request) {
+	name := chi.URLParam(r, "name")
+
+	userIDs, err := models.GetSegmentUsers(name)
+	if err != nil {
+		http.Error(w, "failed to get segment users", http.StatusInternalServerError)
+		return
+	}
+
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"segment": name,
+		"users":   userIDs,
+		"count":   len(userIDs),
+	})
 }

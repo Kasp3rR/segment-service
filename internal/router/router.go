@@ -20,6 +20,7 @@ func NewRouter() http.Handler {
 	r.Post("/segments", handlers.CreateSegmentHandler)
 	r.Delete("/segments/{name}", handlers.DeleteSegmentHandler)
 	r.Patch("/segments/{name}", handlers.UpdateSegmentHandler)
+	r.Get("/segments/{name}/users", handlers.GetSegmentUsersHandler)
 
 	// User routes
 	r.Post("/users", handlers.CreateUserHandler)
