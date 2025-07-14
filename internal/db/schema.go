@@ -34,6 +34,6 @@ func InitSchema(db *sql.DB) error {
 		return err
 	}
 
-	log.Println("✅ Database schema initialized")
+	log.Println("Database schema initialized")
 	return nil
 }

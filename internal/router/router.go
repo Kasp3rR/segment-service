@@ -12,7 +12,7 @@ func NewRouter() http.Handler {
 	r := chi.NewRouter()
 
 	// Health check
-	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
+	r.Get("/segment", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("OK"))
 	})
 

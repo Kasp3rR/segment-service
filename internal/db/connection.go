@@ -24,5 +24,5 @@ func InitDB() {
 		log.Fatalf("Schema init failed: %v", err)
 	}
 
-	log.Println("📦 Database connected and ready.")
+	log.Println("Database connected and ready.")
 }

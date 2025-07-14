@@ -6,6 +6,7 @@ import (
 	"time"
 )
 
+// AddUserToSegment добавляет пользователя в сегмент по их ID.
 func AddUserToSegment(userID, segmentID int) error {
 	_, err := db.DB.Exec(`
 		INSERT OR IGNORE INTO user_segments (user_id, segment_id)
@@ -14,6 +15,7 @@ func AddUserToSegment(userID, segmentID int) error {
 	return err
 }
 
+// RemoveUserFromSegment удаляет пользователя из сегмента по их ID.
 func RemoveUserFromSegment(userID, segmentID int) error {
 	_, err := db.DB.Exec(`
 		DELETE FROM user_segments
@@ -22,6 +24,7 @@ func RemoveUserFromSegment(userID, segmentID int) error {
 	return err
 }
 
+// GetUserSegments возвращает список названий сегментов, в которых состоит пользователь.
 func GetUserSegments(userID int) ([]string, error) {
 	rows, err := db.DB.Query(`
 		SELECT s.name
@@ -46,6 +49,9 @@ func GetUserSegments(userID int) ([]string, error) {
 	return segments, nil
 }
 
+// AssignSegmentRandomly случайным образом распределяет сегмент на ratio пользователей и обновляет distribution_ratio в БД.
+// segmentName — имя сегмента, ratio — доля пользователей (от 0 до 1).
+// Возвращает количество назначенных пользователей.
 func AssignSegmentRandomly(segmentName string, ratio float64) (int, error) {
 	// Получаем сегмент по имени
 	segment, err := GetSegmentByName(segmentName)
@@ -100,6 +106,7 @@ func AssignSegmentRandomly(segmentName string, ratio float64) (int, error) {
 	return count, nil
 }
 
+// GetSegmentUsers возвращает список ID пользователей, входящих в сегмент с заданным именем.
 func GetSegmentUsers(segmentName string) ([]int, error) {
 	rows, err := db.DB.Query(`
 		SELECT u.id
